@@ -254,7 +254,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--M", type=int, default=1024)
     p.add_argument("--N", type=int, default=1024)
     p.add_argument("--K", type=int, default=1024)
-    p.add_argument("--outdir", type=str, default="build/gemm2")
+    p.add_argument("--outdir", type=str, default="build/gemm3")
 
     # Config sourcing
     p.add_argument("--use-carver", action="store_true", help="Use Carver to recommend top-k configs (requires TileLang with Carver)")
