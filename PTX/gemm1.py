@@ -122,9 +122,9 @@ def generate_configs_grid() -> List[GemmConfig]:
     # Small grid with only 2-3 examples for testing
     grid = itertools.product(
         [128],             # block_M
-        [128],             # block_N
+        [128, 64],        # block_N
         [32],              # block_K
-        [0, 2],            # num_stages
+        [0],               # num_stages
         [256],             # thread_num
         [False],           # enable_rasteration
     )
@@ -254,7 +254,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--M", type=int, default=4096)
     p.add_argument("--N", type=int, default=4096)
     p.add_argument("--K", type=int, default=4096)
-    p.add_argument("--outdir", type=str, default="build/gemm")
+    p.add_argument("--outdir", type=str, default="build/gemm1")
 
     # Config sourcing
     p.add_argument("--use-carver", action="store_true", help="Use Carver to recommend top-k configs (requires TileLang with Carver)")

@@ -4,6 +4,9 @@
 #include <tl_templates/cuda/ldsm.h>
 #include <tl_templates/cuda/threadblock_swizzle.h>
 #include <tl_templates/cuda/debug.h>
+#ifdef ENABLE_BF16
+#include <tl_templates/cuda/cuda_bf16_fallbacks.cuh>
+#endif
 
 extern "C" __global__ void main_kernel(half_t* __restrict__ A, half_t* __restrict__ B, half_t* __restrict__ C);
 extern "C" __global__ void __launch_bounds__(256, 1) main_kernel(half_t* __restrict__ A, half_t* __restrict__ B, half_t* __restrict__ C) {
@@ -11,7 +14,7 @@ extern "C" __global__ void __launch_bounds__(256, 1) main_kernel(half_t* __restr
   float C_local[64];
   #pragma unroll
   for (int i = 0; i < 32; ++i) {
-    *(float2*)(C_local + (i * 2)) = make_float2(0.000000e+00f, 0.000000e+00f);
+    *(float2*)(C_local + (i * 2)) = make_float2(0x0p+0f/*0.000000e+00*/, 0x0p+0f/*0.000000e+00*/);
   }
   for (int k = 0; k < 128; ++k) {
     __syncthreads();
@@ -24,7 +27,7 @@ extern "C" __global__ void __launch_bounds__(256, 1) main_kernel(half_t* __restr
       *(uint4*)(((half_t*)buf_dyn_shmem) + (((((i_2 * 2048) + ((((int)threadIdx.x) >> 2) * 32)) + (((((((int)threadIdx.x) & 31) >> 4) + ((((int)threadIdx.x) & 3) >> 1)) & 1) * 16)) + (((((((int)threadIdx.x) & 15) >> 3) + (((int)threadIdx.x) & 1)) & 1) * 8)) + 4096)) = *(uint4*)(B + (((((((int)blockIdx.x) * 524288) + (i_2 * 262144)) + ((((int)threadIdx.x) >> 2) * 4096)) + (k * 32)) + ((((int)threadIdx.x) & 3) * 8)));
     }
     __syncthreads();
-    tl::gemm_ss<128, 128, 32, 2, 4, 0, 1, 0>((&(((half_t*)buf_dyn_shmem)[0])), (&(((half_t*)buf_dyn_shmem)[4096])), (&(C_local[0])));
+    tl::gemm_ss<128, 128, 32, 2, 4, 0, 1, 0, 32, 32, 0, 0>((&(((half_t*)buf_dyn_shmem)[0])), (&(((half_t*)buf_dyn_shmem)[4096])), (&(C_local[0])));
   }
   #pragma unroll
   for (int i_3 = 0; i_3 < 32; ++i_3) {
