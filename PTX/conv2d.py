@@ -9,12 +9,6 @@ Design goals:
 - Avoid cp.async in emitted PTX by:
   * Removing pipelined copies
   * Replacing T.copy(...) with manual element-wise loads into shared memory
-
-Example:
-  python conv2d_codegen.py \
-      --N 128 --C 128 --H 64 --W 64 --F 128 --K 3 --S 1 --P 1 \
-      --outdir build/conv2d_variants \
-      --compile --sm 80
 """
 
 import argparse
@@ -256,16 +250,17 @@ def emit_cuda_sources(
 # CLI
 # -------------------------------------------------------------------------------------
 def parse_args():
-    p = argparse.ArgumentParser(description="Generate CUDA/PTX variants for Conv2D.")
-    p.add_argument("--N", type=int, default=128)
-    p.add_argument("--C", type=int, default=128)
-    p.add_argument("--H", type=int, default=64)
-    p.add_argument("--W", type=int, default=64)
-    p.add_argument("--F", type=int, default=128)
-    p.add_argument("--K", type=int, default=3)
-    p.add_argument("--S", type=int, default=1)
-    p.add_argument("--D", type=int, default=1)
-    p.add_argument("--P", type=int, default=1)
+    p = argparse.ArgumentParser(description="Generate CUDA/PTX variants for Conv2D (blog config defaults).")
+    # Blog defaults: N=100, C=3, H=W=224, F=96, K=11, S=4, P=2, D=1
+    p.add_argument("--N", type=int, default=100, help="Batch size")
+    p.add_argument("--C", type=int, default=3,   help="Input channels")
+    p.add_argument("--H", type=int, default=224, help="Input height")
+    p.add_argument("--W", type=int, default=224, help="Input width")
+    p.add_argument("--F", type=int, default=96,  help="Output channels")
+    p.add_argument("--K", type=int, default=11,  help="Kernel size (square)")
+    p.add_argument("--S", type=int, default=4,   help="Stride")
+    p.add_argument("--D", type=int, default=1,   help="Dilation")
+    p.add_argument("--P", type=int, default=2,   help="Padding")
     p.add_argument("--outdir", type=str, default="build/conv2d")
     p.add_argument("--compile", action="store_true", default=True)
     p.add_argument("--sm", type=int, default=80)

@@ -16,21 +16,28 @@ extern "C" __global__ void __launch_bounds__(128, 1) main_kernel(half_t* __restr
   for (int i = 0; i < 16; ++i) {
     *(float2*)(out_local + (i * 2)) = make_float2(0x0p+0f/*0.000000e+00*/, 0x0p+0f/*0.000000e+00*/);
   }
-  for (int kt = 0; kt < 36; ++kt) {
+  for (int kt = 0; kt < 12; ++kt) {
     #pragma unroll
-    for (int i_1 = 0; i_1 < 2; ++i_1) {
-      bool inb = ((((1 <= ((kt / 12) + (((int)blockIdx.y) & 63))) && (((kt / 12) + (((int)blockIdx.y) & 63)) < 65)) && (1 <= (((i_1 * 32) + (((int)threadIdx.x) >> 2)) + ((kt % 12) >> 2)))) && ((((i_1 * 32) + (((int)threadIdx.x) >> 2)) + ((kt % 12) >> 2)) < 65));
-      uint4 condval;
-      if ((((((1 <= (((i_1 * 32) + (((int)threadIdx.x) >> 2)) + ((kt % 12) >> 2))) && ((((i_1 * 32) + (((int)threadIdx.x) >> 2)) + ((kt % 12) >> 2)) < 65)) && (1 <= ((kt / 12) + (((int)blockIdx.y) & 63)))) && (((kt / 12) + (((int)blockIdx.y) & 63)) < 65)) && inb)) {
-        condval = *(uint4*)(data + ((((((((kt / 12) * 8192) + (((int)blockIdx.y) * 8192)) + (i_1 * 4096)) + ((((int)threadIdx.x) >> 2) * 128)) + ((kt % 12) * 32)) + ((((int)threadIdx.x) & 3) * 8)) - 8320));
+    for (int i_1 = 0; i_1 < 16; ++i_1) {
+      bool inb = (((((1 <= (((((((((int)blockIdx.y) * 64) + (i_1 * 4)) + (((int)threadIdx.x) >> 5)) % 3025) / 55) * 2) + (((kt * 32) + (((int)threadIdx.x) & 31)) / 66))) && ((((((((((int)blockIdx.y) * 64) + (i_1 * 4)) + (((int)threadIdx.x) >> 5)) % 3025) / 55) * 2) + (((kt * 32) + (((int)threadIdx.x) & 31)) / 66)) < 113)) && (1 <= ((((((((int)blockIdx.y) * 64) + (i_1 * 4)) + (((int)threadIdx.x) >> 5)) % 55) * 2) + ((((kt * 32) + (((int)threadIdx.x) & 31)) % 33) / 6)))) && (((((((((int)blockIdx.y) * 64) + (i_1 * 4)) + (((int)threadIdx.x) >> 5)) % 55) * 2) + ((((kt * 32) + (((int)threadIdx.x) & 31)) % 33) / 6)) < 113)) && (((kt * 32) + (((int)threadIdx.x) & 31)) < 363));
+      half_t condval;
+      if (((((((1 <= ((((((((int)blockIdx.y) * 64) + (i_1 * 4)) + (((int)threadIdx.x) >> 5)) % 55) * 2) + ((((kt * 32) + (((int)threadIdx.x) & 31)) % 33) / 6))) && (((((((((int)blockIdx.y) * 64) + (i_1 * 4)) + (((int)threadIdx.x) >> 5)) % 55) * 2) + ((((kt * 32) + (((int)threadIdx.x) & 31)) % 33) / 6)) < 113)) && (1 <= (((((((((int)blockIdx.y) * 64) + (i_1 * 4)) + (((int)threadIdx.x) >> 5)) % 3025) / 55) * 2) + (((kt * 32) + (((int)threadIdx.x) & 31)) / 66)))) && ((((((((((int)blockIdx.y) * 64) + (i_1 * 4)) + (((int)threadIdx.x) >> 5)) % 3025) / 55) * 2) + (((kt * 32) + (((int)threadIdx.x) & 31)) / 66)) < 113)) && (((((int)blockIdx.y) * 16) + i_1) < 75625)) && inb)) {
+        condval = data[((((((((((((int)blockIdx.y) * 64) + (i_1 * 4)) + (((int)threadIdx.x) >> 5)) / 3025) * 150528) + ((((((((int)blockIdx.y) * 64) + (i_1 * 4)) + (((int)threadIdx.x) >> 5)) % 3025) / 55) * 2688)) + ((((kt * 32) + (((int)threadIdx.x) & 31)) / 33) * 672)) + (((((((int)blockIdx.y) * 64) + (i_1 * 4)) + (((int)threadIdx.x) >> 5)) % 55) * 12)) + (((kt * 32) + (((int)threadIdx.x) & 31)) % 33)) - 1350)];
       } else {
-        condval = make_uint4(__pack_half2(half_t(0x0p+0f/*0.000000e+00*/), half_t(0x0p+0f/*0.000000e+00*/)), __pack_half2(half_t(0x0p+0f/*0.000000e+00*/), half_t(0x0p+0f/*0.000000e+00*/)), __pack_half2(half_t(0x0p+0f/*0.000000e+00*/), half_t(0x0p+0f/*0.000000e+00*/)), __pack_half2(half_t(0x0p+0f/*0.000000e+00*/), half_t(0x0p+0f/*0.000000e+00*/)));
+        condval = half_t(0x0p+0f/*0.000000e+00*/);
       }
-      *(uint4*)(((half_t*)buf_dyn_shmem) + (((((i_1 * 1024) + ((((int)threadIdx.x) >> 2) * 32)) + (((((((int)threadIdx.x) & 31) >> 4) + ((((int)threadIdx.x) & 3) >> 1)) & 1) * 16)) + (((((((int)threadIdx.x) & 15) >> 3) + (((int)threadIdx.x) & 1)) & 1) * 8)) + 2048)) = condval;
+      ((half_t*)buf_dyn_shmem)[((((((i_1 * 128) + ((((int)threadIdx.x) >> 5) * 32)) + (((((((int)threadIdx.x) & 31) >> 4) + (i_1 & 1)) & 1) * 16)) + ((((((int)threadIdx.x) >> 6) + ((((int)threadIdx.x) & 15) >> 3)) & 1) * 8)) + (((int)threadIdx.x) & 7)) + 2048)] = condval;
     }
     #pragma unroll
     for (int i_2 = 0; i_2 < 2; ++i_2) {
-      *(uint4*)(((half_t*)buf_dyn_shmem) + (((((i_2 * 1024) + ((((int)threadIdx.x) >> 3) * 64)) + (((((((int)threadIdx.x) & 63) >> 5) + ((((int)threadIdx.x) & 7) >> 2)) & 1) * 32)) + (((((((int)threadIdx.x) & 31) >> 4) + ((((int)threadIdx.x) & 3) >> 1)) & 1) * 16)) + (((((((int)threadIdx.x) & 15) >> 3) + (((int)threadIdx.x) & 1)) & 1) * 8))) = *(uint4*)(w_flat + (((((kt * 4096) + (i_2 * 2048)) + ((((int)threadIdx.x) >> 3) * 128)) + (((int)blockIdx.x) * 64)) + ((((int)threadIdx.x) & 7) * 8)));
+      bool inb_w = (((((kt * 32) + (i_2 * 16)) + (((int)threadIdx.x) >> 3)) < 363) && (((((int)blockIdx.x) * 2) + ((((int)threadIdx.x) & 7) >> 2)) < 3));
+      uint4 condval_1;
+      if ((((((((int)blockIdx.x) * 2) + ((((int)threadIdx.x) & 7) >> 2)) < 3) && ((((kt * 32) + (i_2 * 16)) + (((int)threadIdx.x) >> 3)) < 363)) && inb_w)) {
+        condval_1 = *(uint4*)(w_flat + (((((kt * 3072) + (i_2 * 1536)) + ((((int)threadIdx.x) >> 3) * 96)) + (((int)blockIdx.x) * 64)) + ((((int)threadIdx.x) & 7) * 8)));
+      } else {
+        condval_1 = make_uint4(__pack_half2(half_t(0x0p+0f/*0.000000e+00*/), half_t(0x0p+0f/*0.000000e+00*/)), __pack_half2(half_t(0x0p+0f/*0.000000e+00*/), half_t(0x0p+0f/*0.000000e+00*/)), __pack_half2(half_t(0x0p+0f/*0.000000e+00*/), half_t(0x0p+0f/*0.000000e+00*/)), __pack_half2(half_t(0x0p+0f/*0.000000e+00*/), half_t(0x0p+0f/*0.000000e+00*/)));
+      }
+      *(uint4*)(((half_t*)buf_dyn_shmem) + (((((i_2 * 1024) + ((((int)threadIdx.x) >> 3) * 64)) + (((((((int)threadIdx.x) & 63) >> 5) + ((((int)threadIdx.x) & 7) >> 2)) & 1) * 32)) + (((((((int)threadIdx.x) & 31) >> 4) + ((((int)threadIdx.x) & 3) >> 1)) & 1) * 16)) + (((((((int)threadIdx.x) & 15) >> 3) + (((int)threadIdx.x) & 1)) & 1) * 8))) = condval_1;
     }
     __syncthreads();
     tl::gemm_ss<64, 64, 32, 2, 2, 0, 0, 0, 32, 64, 0, 0>((&(((half_t*)buf_dyn_shmem)[2048])), (&(((half_t*)buf_dyn_shmem)[0])), (&(out_local[0])));
@@ -47,7 +54,9 @@ extern "C" __global__ void __launch_bounds__(128, 1) main_kernel(half_t* __restr
   __syncthreads();
   #pragma unroll
   for (int i_4 = 0; i_4 < 4; ++i_4) {
-    *(uint4*)(out_flat + (((((((int)blockIdx.y) * 8192) + (i_4 * 2048)) + ((((int)threadIdx.x) >> 3) * 128)) + (((int)blockIdx.x) * 64)) + ((((int)threadIdx.x) & 7) * 8))) = *(uint4*)(((half_t*)buf_dyn_shmem) + ((i_4 * 1024) + (((int)threadIdx.x) * 8)));
+    if (((((((int)blockIdx.y) * 16) + (i_4 * 4)) + (((int)threadIdx.x) >> 5)) < 75625) && (((((int)blockIdx.x) * 2) + ((((int)threadIdx.x) & 7) >> 2)) < 3)) {
+      *(uint4*)(out_flat + (((((((int)blockIdx.y) * 6144) + (i_4 * 1536)) + ((((int)threadIdx.x) >> 3) * 96)) + (((int)blockIdx.x) * 64)) + ((((int)threadIdx.x) & 7) * 8))) = *(uint4*)(((half_t*)buf_dyn_shmem) + ((i_4 * 1024) + (((int)threadIdx.x) * 8)));
+    }
   }
 }
 
@@ -72,7 +81,7 @@ extern "C" int init() {
 }
 
 extern "C" int call(half_t* __restrict__ data, half_t* __restrict__ w_flat, half_t* __restrict__ out_flat, cudaStream_t stream=cudaStreamDefault) {
-	main_kernel<<<dim3(2, 8192, 1), dim3(128, 1, 1), 8192, stream>>>(data, out_flat, w_flat);
+	main_kernel<<<dim3(2, 4727, 1), dim3(128, 1, 1), 8192, stream>>>(data, out_flat, w_flat);
 	TILELANG_CHECK_LAST_ERROR("main_kernel");
 
 	return 0;
