@@ -188,7 +188,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--M", type=int, default=1024)
     p.add_argument("--N", type=int, default=1024)
     p.add_argument("--K", type=int, default=1024)
-    p.add_argument("--outdir", type=str, default="build/gemm1")
+    p.add_argument("--outdir", type=str, default="build/gemm3")
     p.add_argument("--compile", action="store_true", default=True)
     p.add_argument("--sm", type=int, default=80, help="SM arch (80=A100, 90=H100)")
     p.add_argument("--check", action="store_true", default=True)
