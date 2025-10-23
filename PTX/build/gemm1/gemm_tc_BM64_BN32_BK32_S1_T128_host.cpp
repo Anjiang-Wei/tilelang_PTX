@@ -47,38 +47,38 @@ class Module:
         T.attr("default", "device_id", dev_id)
         T.attr("default", "device_type", 2)
         assert T.tvm_struct_get(A_handle, 0, 5, "uint8") == T.uint8(2) and T.tvm_struct_get(A_handle, 0, 6, "uint8") == T.uint8(16) and T.tvm_struct_get(A_handle, 0, 7, "uint16") == T.uint16(1), "main.A_handle.dtype is expected to be float16"
-        assert T.Cast("int32", main_A_handle_shape_1[0]) == 4096, "Argument main.A_handle.shape[0] has an unsatisfied constraint: 4096 == T.Cast(\"int32\", main_A_handle_shape[0])"
-        assert T.Cast("int32", main_A_handle_shape_1[1]) == 4096, "Argument main.A_handle.shape[1] has an unsatisfied constraint: 4096 == T.Cast(\"int32\", main_A_handle_shape[1])"
+        assert T.Cast("int32", main_A_handle_shape_1[0]) == 2048, "Argument main.A_handle.shape[0] has an unsatisfied constraint: 2048 == T.Cast(\"int32\", main_A_handle_shape[0])"
+        assert T.Cast("int32", main_A_handle_shape_1[1]) == 2048, "Argument main.A_handle.shape[1] has an unsatisfied constraint: 2048 == T.Cast(\"int32\", main_A_handle_shape[1])"
         assert T.if_then_else(T.isnullptr(main_A_handle_strides), 1, T.Cast("int32", main_A_handle_strides_1[1])) == 1, "Argument main.A_handle.strides[1] has an unsatisfied constraint: 1 == T.if_then_else(T.isnullptr(main_A_handle_strides), 1, T.Cast(\"int32\", main_A_handle_strides_1[1]))"
-        assert T.if_then_else(T.isnullptr(main_A_handle_strides), T.Cast("int32", main_A_handle_shape_1[1]), T.Cast("int32", main_A_handle_strides_1[0])) == 4096, "Argument main.A_handle.strides[0] has an unsatisfied constraint: 4096 == T.if_then_else(T.isnullptr(main_A_handle_strides), T.Cast(\"int32\", main_A_handle_shape[1]), T.Cast(\"int32\", main_A_handle_strides_1[0]))"
+        assert T.if_then_else(T.isnullptr(main_A_handle_strides), T.Cast("int32", main_A_handle_shape_1[1]), T.Cast("int32", main_A_handle_strides_1[0])) == 2048, "Argument main.A_handle.strides[0] has an unsatisfied constraint: 2048 == T.if_then_else(T.isnullptr(main_A_handle_strides), T.Cast(\"int32\", main_A_handle_shape[1]), T.Cast(\"int32\", main_A_handle_strides_1[0]))"
         assert T.uint64(0) == T.tvm_struct_get(A_handle, 0, 8, "uint64"), "Argument main.A_handle.byte_offset has an unsatisfied constraint: T.uint64(0) == T.tvm_struct_get(A_handle, 0, 8, \"uint64\")"
         assert T.tvm_struct_get(A_handle, 0, 10, "int32") == 2, "Argument main.A_handle.device_type has an unsatisfied constraint: 2 == T.tvm_struct_get(A_handle, 0, 10, \"int32\")"
         assert not T.isnullptr(A), "main.A_handle is expected to have non-NULL data pointer"
         assert T.tvm_struct_get(B_handle, 0, 5, "uint8") == T.uint8(2) and T.tvm_struct_get(B_handle, 0, 6, "uint8") == T.uint8(16) and T.tvm_struct_get(B_handle, 0, 7, "uint16") == T.uint16(1), "main.B_handle.dtype is expected to be float16"
-        assert T.Cast("int32", main_B_handle_shape_1[0]) == 4096, "Argument main.B_handle.shape[0] has an unsatisfied constraint: 4096 == T.Cast(\"int32\", main_B_handle_shape[0])"
-        assert T.Cast("int32", main_B_handle_shape_1[1]) == 4096, "Argument main.B_handle.shape[1] has an unsatisfied constraint: 4096 == T.Cast(\"int32\", main_B_handle_shape[1])"
+        assert T.Cast("int32", main_B_handle_shape_1[0]) == 2048, "Argument main.B_handle.shape[0] has an unsatisfied constraint: 2048 == T.Cast(\"int32\", main_B_handle_shape[0])"
+        assert T.Cast("int32", main_B_handle_shape_1[1]) == 2048, "Argument main.B_handle.shape[1] has an unsatisfied constraint: 2048 == T.Cast(\"int32\", main_B_handle_shape[1])"
         assert T.if_then_else(T.isnullptr(main_B_handle_strides), 1, T.Cast("int32", main_B_handle_strides_1[1])) == 1, "Argument main.B_handle.strides[1] has an unsatisfied constraint: 1 == T.if_then_else(T.isnullptr(main_B_handle_strides), 1, T.Cast(\"int32\", main_B_handle_strides_1[1]))"
-        assert T.if_then_else(T.isnullptr(main_B_handle_strides), T.Cast("int32", main_B_handle_shape_1[1]), T.Cast("int32", main_B_handle_strides_1[0])) == 4096, "Argument main.B_handle.strides[0] has an unsatisfied constraint: 4096 == T.if_then_else(T.isnullptr(main_B_handle_strides), T.Cast(\"int32\", main_B_handle_shape[1]), T.Cast(\"int32\", main_B_handle_strides_1[0]))"
+        assert T.if_then_else(T.isnullptr(main_B_handle_strides), T.Cast("int32", main_B_handle_shape_1[1]), T.Cast("int32", main_B_handle_strides_1[0])) == 2048, "Argument main.B_handle.strides[0] has an unsatisfied constraint: 2048 == T.if_then_else(T.isnullptr(main_B_handle_strides), T.Cast(\"int32\", main_B_handle_shape[1]), T.Cast(\"int32\", main_B_handle_strides_1[0]))"
         assert T.uint64(0) == T.tvm_struct_get(B_handle, 0, 8, "uint64"), "Argument main.B_handle.byte_offset has an unsatisfied constraint: T.uint64(0) == T.tvm_struct_get(B_handle, 0, 8, \"uint64\")"
         assert T.tvm_struct_get(B_handle, 0, 10, "int32") == 2, "Argument main.B_handle.device_type has an unsatisfied constraint: 2 == T.tvm_struct_get(B_handle, 0, 10, \"int32\")"
         assert dev_id == T.tvm_struct_get(B_handle, 0, 9, "int32"), "Argument main.B_handle.device_id has an unsatisfied constraint: dev_id == T.tvm_struct_get(B_handle, 0, 9, \"int32\")"
         assert not T.isnullptr(B), "main.B_handle is expected to have non-NULL data pointer"
         assert T.tvm_struct_get(C_handle, 0, 5, "uint8") == T.uint8(2) and T.tvm_struct_get(C_handle, 0, 6, "uint8") == T.uint8(16) and T.tvm_struct_get(C_handle, 0, 7, "uint16") == T.uint16(1), "main.C_handle.dtype is expected to be float16"
-        assert T.Cast("int32", main_C_handle_shape_1[0]) == 4096, "Argument main.C_handle.shape[0] has an unsatisfied constraint: 4096 == T.Cast(\"int32\", main_C_handle_shape[0])"
-        assert T.Cast("int32", main_C_handle_shape_1[1]) == 4096, "Argument main.C_handle.shape[1] has an unsatisfied constraint: 4096 == T.Cast(\"int32\", main_C_handle_shape[1])"
+        assert T.Cast("int32", main_C_handle_shape_1[0]) == 2048, "Argument main.C_handle.shape[0] has an unsatisfied constraint: 2048 == T.Cast(\"int32\", main_C_handle_shape[0])"
+        assert T.Cast("int32", main_C_handle_shape_1[1]) == 2048, "Argument main.C_handle.shape[1] has an unsatisfied constraint: 2048 == T.Cast(\"int32\", main_C_handle_shape[1])"
         assert T.if_then_else(T.isnullptr(main_C_handle_strides), 1, T.Cast("int32", main_C_handle_strides_1[1])) == 1, "Argument main.C_handle.strides[1] has an unsatisfied constraint: 1 == T.if_then_else(T.isnullptr(main_C_handle_strides), 1, T.Cast(\"int32\", main_C_handle_strides_1[1]))"
-        assert T.if_then_else(T.isnullptr(main_C_handle_strides), T.Cast("int32", main_C_handle_shape_1[1]), T.Cast("int32", main_C_handle_strides_1[0])) == 4096, "Argument main.C_handle.strides[0] has an unsatisfied constraint: 4096 == T.if_then_else(T.isnullptr(main_C_handle_strides), T.Cast(\"int32\", main_C_handle_shape[1]), T.Cast(\"int32\", main_C_handle_strides_1[0]))"
+        assert T.if_then_else(T.isnullptr(main_C_handle_strides), T.Cast("int32", main_C_handle_shape_1[1]), T.Cast("int32", main_C_handle_strides_1[0])) == 2048, "Argument main.C_handle.strides[0] has an unsatisfied constraint: 2048 == T.if_then_else(T.isnullptr(main_C_handle_strides), T.Cast(\"int32\", main_C_handle_shape[1]), T.Cast(\"int32\", main_C_handle_strides_1[0]))"
         assert T.uint64(0) == T.tvm_struct_get(C_handle, 0, 8, "uint64"), "Argument main.C_handle.byte_offset has an unsatisfied constraint: T.uint64(0) == T.tvm_struct_get(C_handle, 0, 8, \"uint64\")"
         assert T.tvm_struct_get(C_handle, 0, 10, "int32") == 2, "Argument main.C_handle.device_type has an unsatisfied constraint: 2 == T.tvm_struct_get(C_handle, 0, 10, \"int32\")"
         assert dev_id == T.tvm_struct_get(C_handle, 0, 9, "int32"), "Argument main.C_handle.device_id has an unsatisfied constraint: dev_id == T.tvm_struct_get(C_handle, 0, 9, \"int32\")"
         assert not T.isnullptr(C), "main.C_handle is expected to have non-NULL data pointer"
-        A_1 = T.decl_buffer((4096, 4096), "float16", data=A, strides=(4096, 1))
-        B_1 = T.decl_buffer((4096, 4096), "float16", data=B, strides=(4096, 1))
-        C_1 = T.decl_buffer((4096, 4096), "float16", data=C, strides=(4096, 1))
-        assert T.FloorMod(4096, 8) == 0, "A: Vectorize dimension in buffer must be divisible by 8"
-        assert T.FloorMod(4096, 8) == 0, "B: Vectorize dimension in buffer must be divisible by 8"
-        assert T.FloorMod(4096, 8) == 0, "C: Vectorize dimension in buffer must be divisible by 8"
+        A_1 = T.decl_buffer((2048, 2048), "float16", data=A, strides=(2048, 1))
+        B_1 = T.decl_buffer((2048, 2048), "float16", data=B, strides=(2048, 1))
+        C_1 = T.decl_buffer((2048, 2048), "float16", data=C, strides=(2048, 1))
+        assert T.FloorMod(2048, 8) == 0, "A: Vectorize dimension in buffer must be divisible by 8"
+        assert T.FloorMod(2048, 8) == 0, "B: Vectorize dimension in buffer must be divisible by 8"
+        assert T.FloorMod(2048, 8) == 0, "C: Vectorize dimension in buffer must be divisible by 8"
         T.call_packed("__tvm_set_device", 2, dev_id)
         with T.attr(0, "compute_scope", "main_compute_"):
-            T.call_packed("main_kernel", A, B, C, 64, 32, 256, 1, 1, 12288)
+            T.call_packed("main_kernel", A, B, C, 64, 32, 128, 1, 1, 6144)
         return 0
