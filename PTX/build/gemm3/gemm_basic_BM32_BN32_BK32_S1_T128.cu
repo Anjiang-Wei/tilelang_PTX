@@ -17,8 +17,8 @@ extern "C" __global__ void __launch_bounds__(128, 1) main_kernel(half_t* __restr
     C_loc[i] = 0x0p+0f/*0.000000e+00*/;
   }
   for (int kt = 0; kt < 32; ++kt) {
-    *(uint4*)(((half_t*)buf_dyn_shmem) + (((int)threadIdx.x) * 8)) = *(uint4*)(A + ((((((int)blockIdx.y) * 32768) + ((((int)threadIdx.x) >> 2) * 1024)) + (kt * 32)) + ((((int)threadIdx.x) & 3) * 8)));
-    *(uint4*)(((half_t*)buf_dyn_shmem) + ((((int)threadIdx.x) * 8) + 1024)) = *(uint4*)(B + ((((((int)blockIdx.x) * 32768) + ((((int)threadIdx.x) >> 2) * 1024)) + (kt * 32)) + ((((int)threadIdx.x) & 3) * 8)));
+    *(uint4*)(((half_t*)buf_dyn_shmem) + (((int)threadIdx.x) * 8)) = *(uint4*)(A + (((((((int)blockIdx.x) >> 5) * 32768) + ((((int)threadIdx.x) >> 2) * 1024)) + (kt * 32)) + ((((int)threadIdx.x) & 3) * 8)));
+    *(uint4*)(((half_t*)buf_dyn_shmem) + ((((int)threadIdx.x) * 8) + 1024)) = *(uint4*)(B + (((((((int)blockIdx.x) & 31) * 32768) + ((((int)threadIdx.x) >> 2) * 1024)) + (kt * 32)) + ((((int)threadIdx.x) & 3) * 8)));
     __syncthreads();
     for (int kk = 0; kk < 32; ++kk) {
       #pragma unroll
@@ -30,7 +30,7 @@ extern "C" __global__ void __launch_bounds__(128, 1) main_kernel(half_t* __restr
   }
   #pragma unroll
   for (int i_2 = 0; i_2 < 8; ++i_2) {
-    C[(((((((int)blockIdx.y) * 32768) + (i_2 * 4096)) + ((((int)threadIdx.x) >> 5) * 1024)) + (((int)blockIdx.x) * 32)) + (((int)threadIdx.x) & 31))] = ((half_t)C_loc[i_2]);
+    C[((((((((int)blockIdx.x) >> 5) * 32768) + (i_2 * 4096)) + ((((int)threadIdx.x) >> 5) * 1024)) + ((((int)blockIdx.x) & 31) * 32)) + (((int)threadIdx.x) & 31))] = ((half_t)C_loc[i_2]);
   }
 }
 
@@ -55,7 +55,7 @@ extern "C" int init() {
 }
 
 extern "C" int call(half_t* __restrict__ A, half_t* __restrict__ B, half_t* __restrict__ C, cudaStream_t stream=cudaStreamDefault) {
-	main_kernel<<<dim3(32, 32, 1), dim3(128, 1, 1), 4096, stream>>>(A, B, C);
+	main_kernel<<<dim3(1024, 1, 1), dim3(128, 1, 1), 4096, stream>>>(A, B, C);
 	TILELANG_CHECK_LAST_ERROR("main_kernel");
 
 	return 0;

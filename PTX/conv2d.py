@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """
-Generate two Conv2D CUDA/PTX variants with identical CTA tiles (64x64):
+Generate two Conv2D CUDA/PTX variants with identical CTA tiles (64x64) and 1D grid launching:
   1) TC    : tensor-core GEMM (FP16 inputs, FP32 accum)
   2) BASIC : SIMT FMA micro-kernel (no tensor cores)
 
 Design goals:
 - Same work per CTA (64x64 tile), suitable for equivalence checking.
+- 1D grid launching (total_tiles computed from num_tiles_x * num_tiles_y)
 - Avoid cp.async in emitted PTX by:
   * Removing pipelined copies
   * Replacing T.copy(...) with manual element-wise loads into shared memory
@@ -71,12 +72,17 @@ def build_conv2d_kernel(N, C, H, W, F, K, S, D, P):
             kernel: T.Tensor((KH, KW, C, F), dtype),
             out: T.Tensor((N, OH, OW, F), dtype),
         ):
+            # 1D grid launching: compute total tiles and launch with 1D grid
             # Grid: (F / block_N) x ((N*OH*OW) / block_M)
-            with T.Kernel(
-                T.ceildiv(F, block_N),
-                T.ceildiv(N * OH * OW, block_M),
-                threads=thread_num,
-            ) as (bx, by):
+            num_tiles_n = T.ceildiv(F, block_N)
+            num_tiles_m = T.ceildiv(N * OH * OW, block_M)
+            total_tiles = num_tiles_n * num_tiles_m
+
+            with T.Kernel(total_tiles, threads=thread_num) as (block_idx,):
+                # Map 1D block index to 2D tile coordinates
+                bx = block_idx % num_tiles_n  # tile in F dimension
+                by = block_idx // num_tiles_n  # tile in M dimension (N*OH*OW)
+
                 # Shared tiles
                 data_shared = T.alloc_shared((block_M, block_K), dtype)
                 w_shared    = T.alloc_shared((block_K, block_N), dtype)

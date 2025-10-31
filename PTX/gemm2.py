@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """
-Generate two equivalent GEMM variants (TC vs BASIC) with NO cp.async.
+Generate two equivalent GEMM variants (TC vs BASIC) with NO cp.async and 1D grid launching.
 
 Both kernels:
-  - Same CTA tile: block_M=64, block_N=64, block_K=32
-  - Same threads per block: 128
+  - Same CTA tile: block_M=64, block_N=32, block_K=32
+  - Same threads per block: 128 (1D)
   - Same num_stages: 1
+  - 1D grid launching (total_tiles computed from num_tiles_x * num_tiles_y)
 Differences:
   - TC variant uses T.gemm(..., transpose_B=True) -> WMMA/WGMMA (tensor cores)
   - BASIC variant uses explicit SIMT FMA loops (no tensor cores)
@@ -65,7 +66,16 @@ def build_kernel(M: int, N: int, K: int):
             B: T.Tensor((N, K), dtype),   # row-major; we will treat as (n,k) and use transpose_B=True for GEMM
             C: T.Tensor((M, N), dtype),   # row-major
         ):
-            with T.Kernel(T.ceildiv(N, block_N), T.ceildiv(M, block_M), threads=thread_num) as (bx, by):
+            # 1D grid launching: compute total tiles and launch with 1D grid
+            num_tiles_n = T.ceildiv(N, block_N)
+            num_tiles_m = T.ceildiv(M, block_M)
+            total_tiles = num_tiles_n * num_tiles_m
+
+            with T.Kernel(total_tiles, threads=thread_num) as (block_idx,):
+                # Map 1D block index to 2D tile coordinates
+                bx = block_idx % num_tiles_n  # tile in N dimension
+                by = block_idx // num_tiles_n  # tile in M dimension
+
                 A_sh = T.alloc_shared((block_M, block_K), dtype)
                 B_sh = T.alloc_shared((block_N, block_K), dtype)
                 C_loc = T.alloc_fragment((block_M, block_N), accum_dtype)

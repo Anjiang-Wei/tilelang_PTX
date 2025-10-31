@@ -19,9 +19,9 @@ extern "C" __global__ void __launch_bounds__(128, 1) main_kernel(half_t* __restr
   for (int kt = 0; kt < 64; ++kt) {
     #pragma unroll
     for (int i_1 = 0; i_1 < 2; ++i_1) {
-      *(uint4*)(((half_t*)buf_dyn_shmem) + ((i_1 * 1024) + (((int)threadIdx.x) * 8))) = *(uint4*)(A + (((((((int)blockIdx.y) * 131072) + (i_1 * 65536)) + ((((int)threadIdx.x) >> 2) * 2048)) + (kt * 32)) + ((((int)threadIdx.x) & 3) * 8)));
+      *(uint4*)(((half_t*)buf_dyn_shmem) + ((i_1 * 1024) + (((int)threadIdx.x) * 8))) = *(uint4*)(A + ((((((((int)blockIdx.x) >> 6) * 131072) + (i_1 * 65536)) + ((((int)threadIdx.x) >> 2) * 2048)) + (kt * 32)) + ((((int)threadIdx.x) & 3) * 8)));
     }
-    *(uint4*)(((half_t*)buf_dyn_shmem) + ((((int)threadIdx.x) * 8) + 2048)) = *(uint4*)(B + ((((((int)blockIdx.x) * 65536) + ((((int)threadIdx.x) >> 2) * 2048)) + (kt * 32)) + ((((int)threadIdx.x) & 3) * 8)));
+    *(uint4*)(((half_t*)buf_dyn_shmem) + ((((int)threadIdx.x) * 8) + 2048)) = *(uint4*)(B + (((((((int)blockIdx.x) & 63) * 65536) + ((((int)threadIdx.x) >> 2) * 2048)) + (kt * 32)) + ((((int)threadIdx.x) & 3) * 8)));
     __syncthreads();
     for (int kk = 0; kk < 32; ++kk) {
       #pragma unroll
@@ -33,7 +33,7 @@ extern "C" __global__ void __launch_bounds__(128, 1) main_kernel(half_t* __restr
   }
   #pragma unroll
   for (int i_3 = 0; i_3 < 16; ++i_3) {
-    C[(((((((int)blockIdx.y) * 131072) + (i_3 * 8192)) + ((((int)threadIdx.x) >> 5) * 2048)) + (((int)blockIdx.x) * 32)) + (((int)threadIdx.x) & 31))] = ((half_t)C_loc[i_3]);
+    C[((((((((int)blockIdx.x) >> 6) * 131072) + (i_3 * 8192)) + ((((int)threadIdx.x) >> 5) * 2048)) + ((((int)blockIdx.x) & 63) * 32)) + (((int)threadIdx.x) & 31))] = ((half_t)C_loc[i_3]);
   }
 }
 
@@ -58,7 +58,7 @@ extern "C" int init() {
 }
 
 extern "C" int call(half_t* __restrict__ A, half_t* __restrict__ B, half_t* __restrict__ C, cudaStream_t stream=cudaStreamDefault) {
-	main_kernel<<<dim3(64, 32, 1), dim3(128, 1, 1), 6144, stream>>>(A, B, C);
+	main_kernel<<<dim3(2048, 1, 1), dim3(128, 1, 1), 6144, stream>>>(A, B, C);
 	TILELANG_CHECK_LAST_ERROR("main_kernel");
 
 	return 0;

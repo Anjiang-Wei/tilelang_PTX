@@ -80,5 +80,5 @@ class Module:
         assert T.FloorMod(4096, 8) == 0, "C: Vectorize dimension in buffer must be divisible by 8"
         T.call_packed("__tvm_set_device", 2, dev_id)
         with T.attr(0, "compute_scope", "main_compute_"):
-            T.call_packed("main_kernel", A, B, C, 64, 64, 128, 1, 1, 8192)
+            T.call_packed("main_kernel", A, B, C, 4096, 128, 1, 1, 8192)
         return 0

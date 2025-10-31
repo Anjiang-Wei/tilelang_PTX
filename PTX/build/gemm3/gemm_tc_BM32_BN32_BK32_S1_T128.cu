@@ -17,8 +17,8 @@ extern "C" __global__ void __launch_bounds__(128, 1) main_kernel(half_t* __restr
     *(float2*)(C_loc + (i * 2)) = make_float2(0x0p+0f/*0.000000e+00*/, 0x0p+0f/*0.000000e+00*/);
   }
   for (int kt = 0; kt < 32; ++kt) {
-    *(uint4*)(((half_t*)buf_dyn_shmem) + ((((((int)threadIdx.x) >> 2) * 32) + (((((((int)threadIdx.x) & 31) >> 4) + ((((int)threadIdx.x) & 3) >> 1)) & 1) * 16)) + (((((((int)threadIdx.x) & 15) >> 3) + (((int)threadIdx.x) & 1)) & 1) * 8))) = *(uint4*)(A + ((((((int)blockIdx.y) * 32768) + ((((int)threadIdx.x) >> 2) * 1024)) + (kt * 32)) + ((((int)threadIdx.x) & 3) * 8)));
-    *(uint4*)(((half_t*)buf_dyn_shmem) + (((((((int)threadIdx.x) >> 2) * 32) + (((((((int)threadIdx.x) & 31) >> 4) + ((((int)threadIdx.x) & 3) >> 1)) & 1) * 16)) + (((((((int)threadIdx.x) & 15) >> 3) + (((int)threadIdx.x) & 1)) & 1) * 8)) + 1024)) = *(uint4*)(B + ((((((int)blockIdx.x) * 32768) + ((((int)threadIdx.x) >> 2) * 1024)) + (kt * 32)) + ((((int)threadIdx.x) & 3) * 8)));
+    *(uint4*)(((half_t*)buf_dyn_shmem) + ((((((int)threadIdx.x) >> 2) * 32) + (((((((int)threadIdx.x) & 31) >> 4) + ((((int)threadIdx.x) & 3) >> 1)) & 1) * 16)) + (((((((int)threadIdx.x) & 15) >> 3) + (((int)threadIdx.x) & 1)) & 1) * 8))) = *(uint4*)(A + (((((((int)blockIdx.x) >> 5) * 32768) + ((((int)threadIdx.x) >> 2) * 1024)) + (kt * 32)) + ((((int)threadIdx.x) & 3) * 8)));
+    *(uint4*)(((half_t*)buf_dyn_shmem) + (((((((int)threadIdx.x) >> 2) * 32) + (((((((int)threadIdx.x) & 31) >> 4) + ((((int)threadIdx.x) & 3) >> 1)) & 1) * 16)) + (((((((int)threadIdx.x) & 15) >> 3) + (((int)threadIdx.x) & 1)) & 1) * 8)) + 1024)) = *(uint4*)(B + (((((((int)blockIdx.x) & 31) * 32768) + ((((int)threadIdx.x) >> 2) * 1024)) + (kt * 32)) + ((((int)threadIdx.x) & 3) * 8)));
     __syncthreads();
     tl::gemm_ss<32, 32, 32, 2, 2, 0, 1, 0, 32, 32, 0, 0>((&(((half_t*)buf_dyn_shmem)[0])), (&(((half_t*)buf_dyn_shmem)[1024])), (&(C_loc[0])));
     __syncthreads();
@@ -29,7 +29,7 @@ extern "C" __global__ void __launch_bounds__(128, 1) main_kernel(half_t* __restr
     float2 v_ = *(float2*)(C_loc + (i_1 * 2));
     ((half2*)(&(__1.x)))->x = (half_t)(v_.x);
     ((half2*)(&(__1.x)))->y = (half_t)(v_.y);
-    *(uint1*)(C + ((((((((((int)blockIdx.y) * 32768) + (((((int)threadIdx.x) & 63) >> 5) * 16384)) + ((i_1 & 1) * 8192)) + (((((int)threadIdx.x) & 31) >> 2) * 1024)) + (((int)blockIdx.x) * 32)) + ((i_1 >> 1) * 16)) + ((((int)threadIdx.x) >> 6) * 8)) + ((((int)threadIdx.x) & 3) * 2))) = __1;
+    *(uint1*)(C + (((((((((((int)blockIdx.x) >> 5) * 32768) + (((((int)threadIdx.x) & 63) >> 5) * 16384)) + ((i_1 & 1) * 8192)) + (((((int)threadIdx.x) & 31) >> 2) * 1024)) + ((((int)blockIdx.x) & 31) * 32)) + ((i_1 >> 1) * 16)) + ((((int)threadIdx.x) >> 6) * 8)) + ((((int)threadIdx.x) & 3) * 2))) = __1;
   }
 }
 
@@ -54,7 +54,7 @@ extern "C" int init() {
 }
 
 extern "C" int call(half_t* __restrict__ A, half_t* __restrict__ B, half_t* __restrict__ C, cudaStream_t stream=cudaStreamDefault) {
-	main_kernel<<<dim3(32, 32, 1), dim3(128, 1, 1), 4096, stream>>>(A, B, C);
+	main_kernel<<<dim3(1024, 1, 1), dim3(128, 1, 1), 4096, stream>>>(A, B, C);
 	TILELANG_CHECK_LAST_ERROR("main_kernel");
 
 	return 0;

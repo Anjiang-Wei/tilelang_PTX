@@ -19,9 +19,9 @@ extern "C" __global__ void __launch_bounds__(128, 1) main_kernel(half_t* __restr
   for (int kt = 0; kt < 64; ++kt) {
     #pragma unroll
     for (int i_1 = 0; i_1 < 2; ++i_1) {
-      *(uint4*)(((half_t*)buf_dyn_shmem) + ((((i_1 * 1024) + ((((int)threadIdx.x) >> 2) * 32)) + (((((((int)threadIdx.x) & 31) >> 4) + ((((int)threadIdx.x) & 3) >> 1)) & 1) * 16)) + (((((((int)threadIdx.x) & 15) >> 3) + (((int)threadIdx.x) & 1)) & 1) * 8))) = *(uint4*)(A + (((((((int)blockIdx.y) * 131072) + (i_1 * 65536)) + ((((int)threadIdx.x) >> 2) * 2048)) + (kt * 32)) + ((((int)threadIdx.x) & 3) * 8)));
+      *(uint4*)(((half_t*)buf_dyn_shmem) + ((((i_1 * 1024) + ((((int)threadIdx.x) >> 2) * 32)) + (((((((int)threadIdx.x) & 31) >> 4) + ((((int)threadIdx.x) & 3) >> 1)) & 1) * 16)) + (((((((int)threadIdx.x) & 15) >> 3) + (((int)threadIdx.x) & 1)) & 1) * 8))) = *(uint4*)(A + ((((((((int)blockIdx.x) >> 6) * 131072) + (i_1 * 65536)) + ((((int)threadIdx.x) >> 2) * 2048)) + (kt * 32)) + ((((int)threadIdx.x) & 3) * 8)));
     }
-    *(uint4*)(((half_t*)buf_dyn_shmem) + (((((((int)threadIdx.x) >> 2) * 32) + (((((((int)threadIdx.x) & 31) >> 4) + ((((int)threadIdx.x) & 3) >> 1)) & 1) * 16)) + (((((((int)threadIdx.x) & 15) >> 3) + (((int)threadIdx.x) & 1)) & 1) * 8)) + 2048)) = *(uint4*)(B + ((((((int)blockIdx.x) * 65536) + ((((int)threadIdx.x) >> 2) * 2048)) + (kt * 32)) + ((((int)threadIdx.x) & 3) * 8)));
+    *(uint4*)(((half_t*)buf_dyn_shmem) + (((((((int)threadIdx.x) >> 2) * 32) + (((((((int)threadIdx.x) & 31) >> 4) + ((((int)threadIdx.x) & 3) >> 1)) & 1) * 16)) + (((((((int)threadIdx.x) & 15) >> 3) + (((int)threadIdx.x) & 1)) & 1) * 8)) + 2048)) = *(uint4*)(B + (((((((int)blockIdx.x) & 63) * 65536) + ((((int)threadIdx.x) >> 2) * 2048)) + (kt * 32)) + ((((int)threadIdx.x) & 3) * 8)));
     __syncthreads();
     tl::gemm_ss<64, 32, 32, 2, 2, 0, 1, 0, 32, 32, 0, 0>((&(((half_t*)buf_dyn_shmem)[0])), (&(((half_t*)buf_dyn_shmem)[2048])), (&(C_loc[0])));
     __syncthreads();
@@ -32,7 +32,7 @@ extern "C" __global__ void __launch_bounds__(128, 1) main_kernel(half_t* __restr
     float2 v_ = *(float2*)(C_loc + (i_2 * 2));
     ((half2*)(&(__1.x)))->x = (half_t)(v_.x);
     ((half2*)(&(__1.x)))->y = (half_t)(v_.y);
-    *(uint1*)(C + (((((((((((int)blockIdx.y) * 131072) + (((i_2 & 3) >> 1) * 65536)) + (((((int)threadIdx.x) & 63) >> 5) * 32768)) + ((i_2 & 1) * 16384)) + (((((int)threadIdx.x) & 31) >> 2) * 2048)) + (((int)blockIdx.x) * 32)) + ((i_2 >> 2) * 16)) + ((((int)threadIdx.x) >> 6) * 8)) + ((((int)threadIdx.x) & 3) * 2))) = __1;
+    *(uint1*)(C + ((((((((((((int)blockIdx.x) >> 6) * 131072) + (((i_2 & 3) >> 1) * 65536)) + (((((int)threadIdx.x) & 63) >> 5) * 32768)) + ((i_2 & 1) * 16384)) + (((((int)threadIdx.x) & 31) >> 2) * 2048)) + ((((int)blockIdx.x) & 63) * 32)) + ((i_2 >> 2) * 16)) + ((((int)threadIdx.x) >> 6) * 8)) + ((((int)threadIdx.x) & 3) * 2))) = __1;
   }
 }
 
@@ -57,7 +57,7 @@ extern "C" int init() {
 }
 
 extern "C" int call(half_t* __restrict__ A, half_t* __restrict__ B, half_t* __restrict__ C, cudaStream_t stream=cudaStreamDefault) {
-	main_kernel<<<dim3(64, 32, 1), dim3(128, 1, 1), 6144, stream>>>(A, B, C);
+	main_kernel<<<dim3(2048, 1, 1), dim3(128, 1, 1), 6144, stream>>>(A, B, C);
 	TILELANG_CHECK_LAST_ERROR("main_kernel");
 
 	return 0;
